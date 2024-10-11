@@ -13,7 +13,6 @@
       input {
         padding: 10px;
         font-size: 16px;
-        width: 200px;
       }
       button {
         padding: 10px 20px;
@@ -27,10 +26,17 @@
         margin-top: 10px;
         font-size: 16px;
       }
-      
+      input {
+        width: 200px;
+      }
+      #mem {
+        width: 300px;
+        display: none;
+        margin-left: auto;
+        margin-right: auto;
+      }
     </style>
   </head>
-  <body>
     <h1>Компьютер загадал число от 1 до 100</h1>
     <input
       type="number"
@@ -40,54 +46,69 @@
       max="100"
     />
     <button id="submitBtn" onclick="Guess()">Угадать</button>
-    <button id="new" onclick="Restart()">Новая игра</button>
+    <button id="newgame" onclick="NewGame()">Новая игра</button>
     <div id="output"></div>
     <div id="attempts"></div>
-
+    <img src="1.jpg" id="mem">
+    <footer>
+      <hr>
+      <p>Разработчик: Алев Борис</p>
+    </footer>
     <script>
+      const img = document.createElement('img');
       // Загадываем число от 1 до 100
       const secretNumber = Math.floor(Math.random() * 100) + 1;
       let attempts = 0;
       const maxAttempts = 10; // Количество максимальных попыток
       const previousGuesses = []; // Массив для хранения предыдущих попыток
-
+      function NewGame() {
+        location.reload();
+      };
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      } 
       function Guess() {
         const outputDiv = document.getElementById("output");
         const attemptsDiv = document.getElementById("attempts");
         const inputField = document.getElementById("userInput");
         const submitButton = document.getElementById("submitBtn");
-
+        const img = document.getElementById("mem")
         const userInput = parseInt(inputField.value);
         
-
+        for (i=0;i < previousGuesses.length; i += 1) {
+          if (previousGuesses[i] == userInput){
+            outputDiv.textContent = "Не повторяйтесь";
+            return;
+          }
+        };
         // Проверка введенного числа
         if (isNaN(userInput) || userInput < 1 || userInput > 100) {
           outputDiv.textContent = "Пожалуйста, введите число от 1 до 100.";
           return;
         }
-        
-         // Сохраняем текущую попытку
-        for(var i =0; i <= previousGuesses.length+1; i++){
-             if(previousGuesses == userInput){
-                outputDiv.textContent = "Не повторяйтесь";
-                return;
-             }
-             else{
-                attempts++;
-            previousGuesses.push(userInput);
-             }
-        }
+        img.src =  (getRandomInt(3) + 1) + '.jpg';
+        img.style.display = "block";
+        attempts++;
+        previousGuesses.push(userInput); // Сохраняем текущую попытку
+        var fail = new Audio();
+        fail.preload = "auto";
+        fail.src = "fail.mp3";
+        var win = new Audio();
+        win.preload = "auto";
+        win.src = "win.mp3";
         if (userInput === secretNumber) {
+          win.play();
           outputDiv.textContent = `Поздравляю! Вы угадали число ${secretNumber} за ${attempts} ${
             attempts === 1 ? "попытку" : "попытки"
           }.`;
           inputField.disabled = true; // Блокируем ввод после выигрыша
         } else if (userInput < secretNumber) {
           outputDiv.textContent = "Ваше число меньше загаданного.";
+          fail.play();
         } else {
           outputDiv.textContent = "Ваше число больше загаданного.";
+          fail.play();
         }
-
         // Обновляем количество оставшихся попыток
         const remainingAttempts = maxAttempts - attempts;
         attemptsDiv.textContent = `Оставшиеся попытки: ${remainingAttempts}`;
@@ -104,9 +125,6 @@
         )}`;
 
         inputField.value = ""; // Очищаем поле ввода
-      }
-      function Restart() {
-        window.location.reload()
       }
     </script>
   </body>
