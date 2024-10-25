@@ -1,5 +1,6 @@
+let answers = ['2','2','18','16','2','46','3','1','5','13'];
+let nameLocalStorage = 'localStorageIvanovIvan';
 function Check() {
-    let answers = ['2','2','18','16','2','46','3','1','5','13']
     var correct = 0;
     var totalPoints = 10;
     var grade;
@@ -41,3 +42,79 @@ function Check() {
     resultElement.innerText = resultText;
     resultElement.style.display = "block";
 }
+function Save() {
+    if (typeof (Storage) !== "undefined") {
+        console.log("Local Storage доступен.");
+    } else {
+
+
+        alert("Local Storage не поддерживается.")
+        return;
+    }
+
+
+    //Создаем  объект в котором соберем ответы пользователя и сохраним время сохранения
+    let object = {
+        userAnswers: [],
+        savedTime: null
+    };
+    //собирает текущие ответы
+    for (let i = 0; i < answers.length; i++)
+        //получаем ссылку на объект input с ответом пользователя
+        object.userAnswers[i] = document.getElementById('a' + (i + 1)).value;
+
+
+    //в свойство объекта savedTime сохраняем текущее время
+    object.savedTime = new Date();
+    console.log(object)
+    //сохраняем объект в ввиде JSON строки в локальном хранилище браузера
+    localStorage.setItem(nameLocalStorage, JSON.stringify(object));
+
+}
+
+function Load() {
+    if (typeof (Storage) !== "undefined") {
+        console.log("Local Storage доступен.");
+    } else {
+
+
+        alert("Local Storage не поддерживается.")
+        return;
+    }
+
+
+    //получение JSON данных из хранилища браузера
+    const temp = localStorage.getItem(nameLocalStorage);
+    console.log(temp);
+    //если в переменной temp null, это означает что в хранилище нет данных с таким ключом
+    if (temp != null) {
+        let object;
+        try {
+            object = JSON.parse(temp);
+            console.log(object);
+        }
+        catch {
+            console.error('Ошибка парсирования JSON');
+            return;
+        }
+        for (let i = 0; i < object.userAnswers.length; i++) {
+            document.getElementById('a' + (i + 1)).value = object.userAnswers[i];
+        }
+    }
+    else alert('Нет сохранений с таким именем')
+}
+info = document.getElementById("info");
+let i = 0;
+function tick() {
+    i++;
+    console.log(i);
+    if (i == 30) {
+        Save();
+        info.innerText="*сохранено*"
+        i = 0;
+    }
+    if (i == 2) {
+        info.innertext=""
+    }
+}
+let si = setInterval(tick, 1000);
